@@ -1,6 +1,8 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
+const geoCode = require('./utils/geocode.js')
+const foreCast = require('./utils/forecast.js')
 
 const app = express()
 
@@ -18,7 +20,7 @@ app.use(express.static(publicDirectory))
 
 app.get('', (req, res) => {
     res.render('index', {
-        title: 'Home',
+        title: 'Weather Forecast',
         name: 'Lalit Kumar'
     })
 })
@@ -52,9 +54,31 @@ app.get('/about', (req, res) => {
 })
 
 app.get('/weather', (req, res) => {
-    res.send({
-        forecast: 'Heavy rainfall detected around noon',
-        location: 'Philadelphia'
+    const address = req.query.address
+    if (!address) {
+        return res.send({
+            error: 'Please provide an address in search query'
+        })
+    }
+    geoCode(address, (error, data) => {
+        if (error) {
+            return res.send({
+                error
+            })
+        }
+
+        foreCast(data.location, (foreCastError, foreCastdata) => {
+            if (foreCastError) {
+                return res.send({
+                    error: foreCastError
+                })
+            }
+            res.send({
+                forecast: foreCastdata,
+                location: foreCastdata.searchedPlace,
+                address
+            })
+        })
     })
 })
 
