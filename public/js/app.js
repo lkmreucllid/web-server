@@ -1,4 +1,3 @@
-console.log('Client Side javascript to the server')
 var address = '!'
 
 
@@ -12,7 +11,7 @@ messageHolder.textContent = 'Loading...'
 weatherForm.addEventListener('submit', (e) => {
     e.preventDefault()
     const location = search.value
-    var url = 'http://localhost:3000/weather?address=' + location
+    var url = '/weather?address=' + location
 
     fetch(url).then((response) => {
 
